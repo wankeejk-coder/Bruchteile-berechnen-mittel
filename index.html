@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <title>Bruchteile einer Zahl</title>
+
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #17202a;
+      --muted: #5f6b76;
+      --primary: #1769aa;
+      --primary-dark: #10558c;
+      --success: #18794e;
+      --success-bg: #eaf7f0;
+      --error: #b42318;
+      --error-bg: #fff0ee;
+      --tip-bg: #fff8df;
+      --tip-border: #e3b341;
+      --border: #d7dde3;
+      --shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding:
+        max(18px, env(safe-area-inset-top))
+        max(18px, env(safe-area-inset-right))
+        max(18px, env(safe-area-inset-bottom))
+        max(18px, env(safe-area-inset-left));
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      touch-action: manipulation;
+    }
+
+    .app {
+      width: min(760px, 100%);
+      margin: auto;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: clamp(22px, 5vw, 42px);
+    }
+
+    h1 {
+      font-size: clamp(30px, 6vw, 44px);
+      margin: 0 0 12px;
+      line-height: 1.1;
+    }
+
+    h2 {
+      font-size: clamp(25px, 5vw, 34px);
+      margin: 0 0 14px;
+    }
+
+    p {
+      line-height: 1.5;
+    }
+
+    .intro {
+      color: var(--muted);
+      font-size: 18px;
+      margin-bottom: 24px;
+    }
+
+    .rule {
+      background: #eef5fb;
+      border-left: 5px solid var(--primary);
+      padding: 16px 18px;
+      border-radius: 12px;
+      font-size: 19px;
+      font-weight: 700;
+      margin: 22px 0;
+    }
+
+    .example {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 26px;
+    }
+
+    .example-title {
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .example-task {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 28px;
+      font-weight: 700;
+      margin: 16px 0;
+    }
+
+    .example-steps {
+      line-height: 1.8;
+      font-size: 18px;
+    }
+
+    .example-result {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .button {
+      width: 100%;
+      min-height: 58px;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 22px;
+      font-size: 19px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.08s ease, background 0.15s ease;
+    }
+
+    .button:active {
+      transform: scale(0.985);
+    }
+
+    .button-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .button-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .button:disabled {
+      opacity: 0.55;
+      cursor: default;
+      transform: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      align-items: center;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .progress-track {
+      height: 10px;
+      background: #e4e9ee;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: var(--primary);
+      transition: width 0.3s ease;
+    }
+
+    .section-label {
+      text-align: center;
+      color: var(--primary);
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .task {
+      text-align: center;
+      margin: 24px 0 30px;
+    }
+
+    .task-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: clamp(34px, 8vw, 54px);
+      font-weight: 700;
+      min-height: 100px;
+    }
+
+    /* Deutsche Bruchschreibweise */
+    .fraction {
+      display: inline-grid;
+      grid-template-rows: auto 3px auto;
+      align-items: center;
+      justify-items: center;
+      vertical-align: middle;
+      min-width: 1.4em;
+      line-height: 1;
+    }
+
+    .fraction .top,
+    .fraction .bottom {
+      padding: 0.08em 0.16em;
+    }
+
+    .fraction .line {
+      width: 100%;
+      height: 3px;
+      background: currentColor;
+      border-radius: 2px;
+    }
+
+    .answer-area {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    .answer-input {
+      width: 100%;
+      height: 68px;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      font-size: 30px;
+      text-align: center;
+      color: var(--text);
+      background: white;
+      outline: none;
+    }
+
+    .answer-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(23, 105, 170, 0.13);
+    }
+
+    .feedback {
+      margin: 20px auto 0;
+      max-width: 540px;
+      border-radius: 14px;
+      padding: 15px 18px;
+      font-size: 19px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .feedback.success {
+      color: var(--success);
+      background: var(--success-bg);
+    }
+
+    .feedback.error {
+      color: var(--error);
+      background: var(--error-bg);
+    }
+
+    .tip {
+      margin: 12px auto 0;
+      max-width: 540px;
+      border-left: 5px solid var(--tip-border);
+      background: var(--tip-bg);
+      padding: 14px 17px;
+      border-radius: 12px;
+      font-size: 17px;
+      text-align: center;
+    }
+
+    .next-wrap {
+      max-width: 440px;
+      margin: 18px auto 0;
+    }
+
+    .summary {
+      text-align: center;
+    }
+
+    .summary-icon {
+      font-size: 60px;
+      margin-bottom: 8px;
+    }
+
+    .summary-box {
+      text-align: left;
+      max-width: 500px;
+      margin: 24px auto;
+      background: #f6f8fa;
+      border-radius: 16px;
+      padding: 20px;
+      font-size: 19px;
+      line-height: 1.7;
+    }
+
+    .summary-message {
+      max-width: 520px;
+      margin: 20px auto 28px;
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    @media (orientation: landscape) and (max-height: 700px) {
+      body {
+        align-items: flex-start;
+      }
+
+      .card {
+        padding: 24px 32px;
+      }
+
+      .task {
+        margin: 12px 0 18px;
+      }
+
+      .task-line {
+        min-height: 70px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<main class="app">
+
+  <!-- STARTSEITE -->
+  <section id="startScreen" class="card">
+
+    <h1>Bruchteile berechnen</h1>
+
+    <p class="intro">
+      Hier übst du, einen Bruchteil von einer Zahl zu berechnen.
+      Du brauchst dafür immer nur zwei Schritte.
+    </p>
+
+    <div class="rule">
+      Merke: Erst durch den Nenner teilen, dann mit dem Zähler malnehmen.
+    </div>
+
+    <div class="example">
+
+      <div class="example-title">Beispiel:</div>
+
+      <div class="example-task">
+        <span class="fraction">
+          <span class="top">3</span>
+          <span class="line"></span>
+          <span class="bottom">4</span>
+        </span>
+        <span>von 20</span>
+      </div>
+
+      <div class="example-steps">
+        1. 20 : 4 = 5<br>
+        2. 5 · 3 = 15
+      </div>
+
+      <div class="example-result">
+        <span>Also:</span>
+
+        <span class="fraction">
+          <span class="top">3</span>
+          <span class="line"></span>
+          <span class="bottom">4</span>
+        </span>
+
+        <span>von 20 = 15</span>
+      </div>
+
+    </div>
+
+    <button id="startButton" class="button button-primary">
+      Übung starten
+    </button>
+
+  </section>
+
+
+  <!-- ÜBUNG -->
+  <section id="exerciseScreen" class="card hidden">
+
+    <div class="progress-top">
+      <span id="progressText">Aufgabe 1 von 10</span>
+      <span>Erst teilen, dann malnehmen</span>
+    </div>
+
+    <div class="progress-track">
+      <div id="progressBar" class="progress-bar"></div>
+    </div>
+
+    <div id="sectionLabel" class="section-label"></div>
+
+    <div class="task">
+      <div id="taskLine" class="task-line"></div>
+    </div>
+
+    <div class="answer-area">
+
+      <input
+        id="answerInput"
+        class="answer-input"
+        type="number"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        min="0"
+        step="1"
+        autocomplete="off"
+        placeholder="Ergebnis"
+        aria-label="Ergebnis eingeben"
+      >
+
+      <button id="checkButton" class="button button-primary">
+        Prüfen
+      </button>
+
+    </div>
+
+    <div id="feedback" class="feedback hidden"></div>
+
+    <div id="tip" class="tip hidden"></div>
+
+    <div id="nextWrap" class="next-wrap hidden">
+      <button id="nextButton" class="button button-primary">
+        Nächste Aufgabe
+      </button>
+    </div>
+
+  </section>
+
+
+  <!-- AUSWERTUNG -->
+  <section id="summaryScreen" class="card summary hidden">
+
+    <div id="summaryIcon" class="summary-icon">🌟</div>
+
+    <h2>Geschafft!</h2>
+
+    <div class="summary-box">
+
+      <div>
+        Bearbeitete Aufgaben:
+        <strong>10</strong>
+      </div>
+
+      <div>
+        Beim ersten Versuch richtig:
+        <strong id="firstTryCount">0</strong>
+      </div>
+
+    </div>
+
+    <div id="summaryMessage" class="summary-message"></div>
+
+    <button id="restartButton" class="button button-primary">
+      Noch einmal üben
+    </button>
+
+  </section>
+
+</main>
+
+
+<script>
+"use strict";
+
+const TOTAL_TASKS = 10;
+
+let tasks = [];
+let currentIndex = 0;
+let firstTryCorrect = 0;
+let attemptsForCurrentTask = 0;
+let answerLocked = false;
+
+
+/* ---------------------------------------------
+   HILFSFUNKTIONEN
+--------------------------------------------- */
+
+function randomItem(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+
+function shuffle(array) {
+
+  const copy = [...array];
+
+  for (let i = copy.length - 1; i > 0; i--) {
+
+    const j = Math.floor(Math.random() * (i + 1));
+
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+
+  return copy;
+}
+
+
+/* ---------------------------------------------
+   MATHEMATISCHE KONTROLLE
+--------------------------------------------- */
+
+function validateTask(task) {
+
+  if (!Number.isInteger(task.number)) return false;
+
+  if (!Number.isInteger(task.numerator)) return false;
+
+  if (!Number.isInteger(task.denominator)) return false;
+
+  if (task.number < 1 || task.number > 100) return false;
+
+  if (task.denominator < 2 || task.denominator > 10) return false;
+
+  if (task.numerator < 1) return false;
+
+  if (task.numerator >= task.denominator) return false;
+
+  if (task.number % task.denominator !== 0) return false;
+
+  const result =
+    (task.number / task.denominator) * task.numerator;
+
+  if (!Number.isInteger(result)) return false;
+
+  if (result < 0) return false;
+
+  return true;
+}
+
+
+/* ---------------------------------------------
+   AUFGABE ERZEUGEN
+--------------------------------------------- */
+
+function generateTask(useNumeratorOne, difficulty) {
+
+  let task;
+
+  do {
+
+    let possibleDenominators;
+
+    if (difficulty === "easy") {
+
+      possibleDenominators = [2, 3, 4, 5, 6];
+
+    } else if (difficulty === "medium") {
+
+      possibleDenominators = [3, 4, 5, 6, 7, 8];
+
+    } else {
+
+      possibleDenominators = [4, 5, 6, 7, 8, 9, 10];
+    }
+
+
+    if (!useNumeratorOne) {
+
+      possibleDenominators =
+        possibleDenominators.filter(
+          denominator => denominator >= 3
+        );
+    }
+
+
+    const denominator =
+      randomItem(possibleDenominators);
+
+
+    let numerator;
+
+
+    if (useNumeratorOne) {
+
+      numerator = 1;
+
+    } else {
+
+      const possibleNumerators = [];
+
+      for (
+        let n = 2;
+        n < denominator;
+        n++
+      ) {
+
+        possibleNumerators.push(n);
+      }
+
+
+      /*
+        Falls bei einem Nenner keine passende Zahl
+        größer als 1 möglich wäre, wird neu erzeugt.
+      */
+
+      if (possibleNumerators.length === 0) {
+        continue;
+      }
+
+
+      numerator =
+        randomItem(possibleNumerators);
+    }
+
+
+    /*
+      Das Ganze wird als Vielfaches des Nenners
+      erzeugt.
+
+      Dadurch geht die erste Division immer
+      ohne Rest auf.
+    */
+
+    const maxMultiplier =
+      Math.floor(100 / denominator);
+
+
+    let minimumMultiplier;
+
+
+    if (difficulty === "easy") {
+
+      minimumMultiplier = 2;
+
+    } else if (difficulty === "medium") {
+
+      minimumMultiplier = 3;
+
+    } else {
+
+      minimumMultiplier = 4;
+    }
+
+
+    if (minimumMultiplier > maxMultiplier) {
+
+      minimumMultiplier = 2;
+    }
+
+
+    const possibleMultipliers = [];
+
+
+    for (
+      let multiplier = minimumMultiplier;
+      multiplier <= maxMultiplier;
+      multiplier++
+    ) {
+
+      possibleMultipliers.push(multiplier);
+    }
+
+
+    const multiplier =
+      randomItem(possibleMultipliers);
+
+
+    const number =
+      denominator * multiplier;
+
+
+    const answer =
+      (number / denominator) * numerator;
+
+
+    task = {
+      numerator,
+      denominator,
+      number,
+      answer
+    };
+
+
+  } while (!validateTask(task));
+
+
+  return task;
+}
+
+
+/* ---------------------------------------------
+   10 AUFGABEN ERZEUGEN
+--------------------------------------------- */
+
+function generateTaskSet() {
+
+  const newTasks = [];
+
+
+  /*
+    Bei jedem neuen Durchlauf wird zufällig
+    entschieden:
+
+    1 oder 2 Aufgaben erhalten den Zähler 1.
+  */
+
+  const numberOfNumeratorOneTasks =
+    Math.random() < 0.5 ? 1 : 2;
+
+
+  /*
+    Die Zähler-1-Aufgaben befinden sich im
+    ersten Bereich.
+
+    Alle anderen Aufgaben haben einen
+    Zähler größer als 1.
+  */
+
+  const numeratorOnePositions =
+    shuffle([0, 1, 2])
+      .slice(0, numberOfNumeratorOneTasks);
+
+
+  for (let i = 0; i < TOTAL_TASKS; i++) {
+
+    let difficulty;
+
+
+    if (i <= 2) {
+
+      difficulty = "easy";
+
+    } else if (i <= 6) {
+
+      difficulty = "medium";
+
+    } else {
+
+      difficulty = "hard";
+    }
+
+
+    const useNumeratorOne =
+      numeratorOnePositions.includes(i);
+
+
+    let task;
+
+    let duplicate;
+
+
+    do {
+
+      task =
+        generateTask(
+          useNumeratorOne,
+          difficulty
+        );
+
+
+      duplicate =
+        newTasks.some(existing =>
+
+          existing.numerator === task.numerator &&
+
+          existing.denominator === task.denominator &&
+
+          existing.number === task.number
+
+        );
+
+
+    } while (duplicate);
+
+
+    newTasks.push(task);
+  }
+
+
+  /*
+    Abschließende Qualitätskontrolle
+  */
+
+  const allValid =
+    newTasks.every(validateTask);
+
+
+  const numeratorOneCount =
+    newTasks.filter(
+      task => task.numerator === 1
+    ).length;
+
+
+  if (
+    !allValid ||
+    numeratorOneCount < 1 ||
+    numeratorOneCount > 2
+  ) {
+
+    return generateTaskSet();
+  }
+
+
+  return newTasks;
+}
+
+
+/* ---------------------------------------------
+   BRUCH DARSTELLEN
+--------------------------------------------- */
+
+function fractionHTML(
+  numerator,
+  denominator
+) {
+
+  return `
+    <span
+      class="fraction"
+      aria-label="${numerator} durch ${denominator}"
+    >
+
+      <span class="top">
+        ${numerator}
+      </span>
+
+      <span class="line"></span>
+
+      <span class="bottom">
+        ${denominator}
+      </span>
+
+    </span>
+  `;
+}
+
+
+/* ---------------------------------------------
+   BEREICHE
+--------------------------------------------- */
+
+function getSectionName(index) {
+
+  if (index <= 2) {
+
+    return "Bereich 1 · Einfach starten";
+  }
+
+
+  if (index <= 6) {
+
+    return "Bereich 2 · Zwei Rechenschritte";
+  }
+
+
+  return "Bereich 3 · Gemischtes Training";
+}
+
+
+/* ---------------------------------------------
+   AUFGABE ANZEIGEN
+--------------------------------------------- */
+
+function showTask() {
+
+  answerLocked = false;
+
+  attemptsForCurrentTask = 0;
+
+
+  const task =
+    tasks[currentIndex];
+
+
+  document
+    .getElementById("progressText")
+    .textContent =
+      `Aufgabe ${currentIndex + 1} von ${TOTAL_TASKS}`;
+
+
+  document
+    .getElementById("progressBar")
+    .style.width =
+      `${((currentIndex + 1) / TOTAL_TASKS) * 100}%`;
+
+
+  document
+    .getElementById("sectionLabel")
+    .textContent =
+      getSectionName(currentIndex);
+
+
+  document
+    .getElementById("taskLine")
+    .innerHTML =
+
+      `${fractionHTML(
+        task.numerator,
+        task.denominator
+      )}
+
+      <span>
+        von ${task.number}
+      </span>`;
+
+
+  const input =
+    document.getElementById("answerInput");
+
+
+  input.value = "";
+
+  input.disabled = false;
+
+
+  document
+    .getElementById("checkButton")
+    .disabled = false;
+
+
+  document
+    .getElementById("feedback")
+    .className =
+      "feedback hidden";
+
+
+  document
+    .getElementById("tip")
+    .className =
+      "tip hidden";
+
+
+  document
+    .getElementById("nextWrap")
+    .classList.add("hidden");
+}
+
+
+/* ---------------------------------------------
+   ANTWORT PRÜFEN
+--------------------------------------------- */
+
+function checkAnswer() {
+
+  if (answerLocked) return;
+
+
+  const input =
+    document.getElementById("answerInput");
+
+
+  const rawValue =
+    input.value.trim();
+
+
+  const feedback =
+    document.getElementById("feedback");
+
+
+  const tip =
+    document.getElementById("tip");
+
+
+  if (rawValue === "") {
+
+    feedback.textContent =
+      "Bitte gib zuerst ein Ergebnis ein.";
+
+    feedback.className =
+      "feedback error";
+
+    return;
+  }
+
+
+  const userAnswer =
+    Number(rawValue);
+
+
+  if (
+    !Number.isInteger(userAnswer) ||
+    userAnswer < 0
+  ) {
+
+    feedback.textContent =
+      "Bitte gib eine ganze Zahl ein.";
+
+    feedback.className =
+      "feedback error";
+
+    return;
+  }
+
+
+  attemptsForCurrentTask++;
+
+
+  const task =
+    tasks[currentIndex];
+
+
+  if (userAnswer === task.answer) {
+
+    answerLocked = true;
+
+
+    if (
+      attemptsForCurrentTask === 1
+    ) {
+
+      firstTryCorrect++;
+    }
+
+
+    feedback.textContent =
+      "✅ Richtig!";
+
+
+    feedback.className =
+      "feedback success";
+
+
+    tip.className =
+      "tip hidden";
+
+
+    input.disabled = true;
+
+
+    document
+      .getElementById("checkButton")
+      .disabled = true;
+
+
+    document
+      .getElementById("nextWrap")
+      .classList.remove("hidden");
+
+
+  } else {
+
+    feedback.textContent =
+      "❌ Noch nicht richtig. Versuch es noch einmal.";
+
+
+    feedback.className =
+      "feedback error";
+
+
+    tip.textContent =
+      "💡 Teile zuerst die Zahl durch den Nenner.";
+
+
+    tip.className =
+      "tip";
+
+
+    input.focus();
+
+    input.select();
+  }
+}
+
+
+/* ---------------------------------------------
+   NÄCHSTE AUFGABE
+--------------------------------------------- */
+
+function nextTask() {
+
+  const button =
+    document.getElementById("nextButton");
+
+
+  if (button.disabled) return;
+
+
+  button.disabled = true;
+
+
+  if (
+    currentIndex <
+    TOTAL_TASKS - 1
+  ) {
+
+    currentIndex++;
+
+    showTask();
+
+
+    setTimeout(() => {
+
+      button.disabled = false;
+
+    }, 350);
+
+
+  } else {
+
+    showSummary();
+
+
+    setTimeout(() => {
+
+      button.disabled = false;
+
+    }, 350);
+  }
+}
+
+
+/* ---------------------------------------------
+   AUSWERTUNG
+--------------------------------------------- */
+
+function showSummary() {
+
+  document
+    .getElementById("exerciseScreen")
+    .classList.add("hidden");
+
+
+  document
+    .getElementById("summaryScreen")
+    .classList.remove("hidden");
+
+
+  document
+    .getElementById("firstTryCount")
+    .textContent =
+      firstTryCorrect;
+
+
+  const icon =
+    document.getElementById("summaryIcon");
+
+
+  const message =
+    document.getElementById("summaryMessage");
+
+
+  if (firstTryCorrect >= 8) {
+
+    icon.textContent = "🌟";
+
+    message.textContent =
+      "Super! Du kannst Bruchteile schon sicher berechnen.";
+
+  } else if (firstTryCorrect >= 5) {
+
+    icon.textContent = "👍";
+
+    message.textContent =
+      "Gut gemacht! Übe noch ein bisschen weiter.";
+
+  } else {
+
+    icon.textContent = "💪";
+
+    message.textContent =
+      "Bleib dran! Denk an die Regel: Erst teilen, dann malnehmen.";
+  }
+}
+
+
+/* ---------------------------------------------
+   START UND NEUSTART
+--------------------------------------------- */
+
+function startExercise() {
+
+  tasks = generateTaskSet();
+
+  currentIndex = 0;
+  firstTryCorrect = 0;
+  attemptsForCurrentTask = 0;
+  answerLocked = false;
+
+
+  document
+    .getElementById("startScreen")
+    .classList.add("hidden");
+
+
+  document
+    .getElementById("summaryScreen")
+    .classList.add("hidden");
+
+
+  document
+    .getElementById("exerciseScreen")
+    .classList.remove("hidden");
+
+
+  showTask();
+}
+
+
+function restartExercise() {
+
+  tasks = generateTaskSet();
+
+  currentIndex = 0;
+  firstTryCorrect = 0;
+  attemptsForCurrentTask = 0;
+  answerLocked = false;
+
+
+  document
+    .getElementById("summaryScreen")
+    .classList.add("hidden");
+
+
+  document
+    .getElementById("exerciseScreen")
+    .classList.remove("hidden");
+
+
+  showTask();
+}
+
+
+/* ---------------------------------------------
+   BEDIENUNG
+--------------------------------------------- */
+
+document
+  .getElementById("startButton")
+  .addEventListener("click", startExercise);
+
+
+document
+  .getElementById("checkButton")
+  .addEventListener("click", checkAnswer);
+
+
+document
+  .getElementById("nextButton")
+  .addEventListener("click", nextTask);
+
+
+document
+  .getElementById("restartButton")
+  .addEventListener("click", restartExercise);
+
+
+document
+  .getElementById("answerInput")
+  .addEventListener("keydown", event => {
+
+    if (event.key !== "Enter") return;
+
+    event.preventDefault();
+
+    if (answerLocked) {
+
+      nextTask();
+
+    } else {
+
+      checkAnswer();
+    }
+  });
+</script>
+
+</body>
+</html>
