@@ -569,7 +569,11 @@ function validateTask(task) {
    AUFGABE ERZEUGEN
 --------------------------------------------- */
 
-function generateTask(useNumeratorOne, difficulty) {
+function generateTask(
+  useNumeratorOne,
+  difficulty,
+  allowUpToTwelve
+) {
 
   let task;
 
@@ -648,8 +652,29 @@ function generateTask(useNumeratorOne, difficulty) {
       ohne Rest auf.
     */
 
+    let multiplierLimit;
+
+
+    if (difficulty === "easy") {
+
+      multiplierLimit = 5;
+
+    } else if (difficulty === "medium") {
+
+      multiplierLimit = 8;
+
+    } else {
+
+      multiplierLimit =
+        allowUpToTwelve ? 12 : 8;
+    }
+
+
     const maxMultiplier =
-      Math.floor(100 / denominator);
+      Math.min(
+        multiplierLimit,
+        Math.floor(100 / denominator)
+      );
 
 
     let minimumMultiplier;
@@ -748,6 +773,23 @@ function generateTaskSet() {
       .slice(0, numberOfNumeratorOneTasks);
 
 
+  /*
+    Nur 2 oder 3 Aufgaben aus dem letzten
+    Bereich dürfen Vielfache bis 12 verwenden.
+
+    Die übrigen Aufgaben bleiben bei kleineren
+    Vielfachen.
+  */
+
+  const numberOfUpToTwelveTasks =
+    Math.random() < 0.5 ? 2 : 3;
+
+
+  const upToTwelvePositions =
+    shuffle([7, 8, 9])
+      .slice(0, numberOfUpToTwelveTasks);
+
+
   for (let i = 0; i < TOTAL_TASKS; i++) {
 
     let difficulty;
@@ -771,6 +813,10 @@ function generateTaskSet() {
       numeratorOnePositions.includes(i);
 
 
+    const allowUpToTwelve =
+      upToTwelvePositions.includes(i);
+
+
     let task;
 
     let duplicate;
@@ -781,7 +827,8 @@ function generateTaskSet() {
       task =
         generateTask(
           useNumeratorOne,
-          difficulty
+          difficulty,
+          allowUpToTwelve
         );
 
 
